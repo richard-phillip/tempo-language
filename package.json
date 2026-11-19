@@ -1,6 +1,6 @@
 {
   "name": "tempo-language",
-  "displayName": "Tempo Language Support",
+  "displayName": "Eigenform Tempo",
   "description": "Syntax highlighting for the Tempo programming language.",
   "version": "0.1.0",
   "publisher": "RichardPhillip",

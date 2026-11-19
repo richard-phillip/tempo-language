@@ -1,9 +1,15 @@
 # Marketplace
 
 Publisher ID: `RichardPhillip`
+Publisher name: eigenform
 Extension: `tempo-language`
 Account: richard@eigenform.art
 
 Manage: https://marketplace.visualstudio.com/manage/publishers/RichardPhillip
 
-The same `vsce login RichardPhillip` publishes this extension, `rust-python-functional-dark`, and `the-fold-pdf`.
+Trusted Publishing policy:
+
+- Repository owner: `richard-phillip`
+- Repository: `tempo-language`
+- Workflow: `publish.yaml`
+- Environment: leave empty

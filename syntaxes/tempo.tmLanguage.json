@@ -1,0 +1,348 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "tempo",
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#use"
+    },
+    {
+      "include": "#plex-def"
+    },
+    {
+      "include": "#fn-def"
+    },
+    {
+      "include": "#fn-call"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#variables"
+    },
+    {
+      "include": "#punctuation"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#operators"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.tempo",
+          "match": "(\\*)(.*$)",
+          "captures": {
+            "1": { "name": "punctuation.definition.comment.tempo" },
+            "2": { "name": "comment.line.content.tempo" }
+          }
+        }
+      ]
+    },
+    
+    "use": {
+      "patterns": [
+        {
+          "name": "meta.import.tempo",
+          "begin": "\\b(use)\\s+",
+          "end-comments": "end with literal period, positive lookahead for new line, or end of file.",
+          "end": "\\.|(?=\\n)|$",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.import.tempo" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.terminator.tempo" }
+          },
+          "patterns": [
+            {
+              "match": "(?:([a-zA-Z_][a-zA-Z0-9_-]*(?:/[a-zA-Z_][a-zA-Z0-9_-]*)*)/)?([a-zA-Z_][a-zA-Z0-9_-]*)",
+              "captures": {
+                "1": { "name": "entity.name.namespace.import.tempo" },
+                "2": { "name": "entity.name.type.library.tempo" }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    "# region plex": {"--------------------------------------------------------------------------": "plex"},
+    "plex-def": {
+      "patterns": [
+        {
+          "match": "\\b(plex)\\s+([a-zA-Z_][a-zA-Z0-9_-]*)\\b",
+          "captures": {
+            "1": { "name": "keyword.declaration.struct.tempo" },
+            "2": { "name": "entity.name.type.struct.definition.tempo" }
+          }
+        },
+        {
+          "name": "meta.struct.definition.tempo",
+          "begin": "\\b(plex)\\s+([a-zA-Z_][a-zA-Z0-9_-]*)\\s*\\{",
+          "end": "\\}",
+          "beginCaptures": {
+            "1": { "name": "keyword.declaration.struct.tempo" },
+            "2": { "name": "entity.name.type.struct.definition.tempo" }
+          },
+          "endCaptures": {
+            "0": { "name": "punctuation.brackets.curly.tempo" }
+          },
+          "patterns": [
+            
+          ]
+        }
+      ]
+    },
+    "# region fn": {"---------------------------------------------------------------------": "fn"},
+    "fn-def": {
+      "patterns": [
+        {
+          "name": "meta.function.definition.tempo",
+          "begin": "\\b(fn|function)\\b\\s+([^\\s\\{]+)",
+          "end": "(?=->)",
+          "beginCaptures": {
+            "1": { "name": "keyword.control.fn.tempo" },
+            "2": { "name": "entity.name.function.definition.tempo" }
+          },
+          "patterns": [
+            {
+              "match": "\\b([a-zA-Z_][a-zA-Z0-9_-]*)\\b(?:\\s*,?\\s*)\\b([a-zA-Z_][a-zA-Z0-9_-]*)\\b(?:\\s*,?\\s*)\\b([a-zA-Z_][a-zA-Z0-9_-]*)\\b",
+              "prompt": "This matches a group of three: parameter label, parameter name, and parameter type in a function definition.",
+              "comment": "theme-facing, prefer variable.parameter.label.tempo, but the labels are argument names.",
+              "@TODO": "handle tuples",
+              "captures": {
+                "1": { "name": "meta.function-call.arguments.tempo" },
+                "2": { "name": "variable.parameter.name.tempo" },
+                "3": { "name": "storage.type.parameter.tempo" }
+              }
+            }
+          ]
+        },
+        {
+          "name": "meta.function.result.tempo",
+          "begin": "->",
+          "end": "(?=\\{|$)",
+          "beginCaptures": {
+            "0": { "name": "keyword.operator.function.arrow.tempo" }
+          },
+          "endCaptures": {
+            "0": { "name": "meta.function.result.tempo" }
+          }
+        },
+        {
+          "name": "constant.language.result.tempo",
+          "match": "\\b(Ok|error)\\b"
+        }
+      ]
+    },
+
+    "fn-call": {
+      "patterns": [
+        {
+          "name": "meta.function.call.imported.tempo",
+          "prompt": "Module-qualified call like ImageBuffer.put or buffer.create_image.",
+          "match": "\\b([A-Z][A-Za-z0-9]*|file|buffer|hdu|image|tempo|path|real)\\b(\\.)\\s*([a-zA-Z_][a-zA-Z0-9_-]*)",
+          "captures": {
+            "1": { "name": "entity.name.type.library.tempo" },
+            "2": { "name": "punctuation.separator.tempo" },
+            "3": { "name": "meta.function.call.tempo" }
+          }
+        },
+        {
+          "name": "variable.parameter.label.tempo",
+          "prompt": "Parameter labels in call blocks: supports hyphen/underscore and spaced variants.",
+          "match": "^\\s*((?:of(?:[-_]positions?|\\s+positions?)|in(?:[-_][xyz]-range|\\s+[xyz]\\s+range)|and(?:[-_][xyz]-range|\\s+[xyz]\\s+range)))\\b"
+        },
+        {
+          "name": "meta.function.call.tempo",
+          "prompt": "any token before a whitepsace character and immeidately after a dot.",
+          "match": "(?<=\\.)\\s*([a-zA-Z_][a-zA-Z0-9_]*)"
+        },
+        {
+          "name": "support.function.builtin.tempo",
+          "match": "\\b(display|fold|zip)\\b"
+        },
+        {
+          "name": "keyword.operator.logical.tempo",
+          "match": "\\b(and(?!-)|or|not|xor)\\b"
+        },
+        {
+          "name": "entity.name.function.call.tempo",
+          "prompt": "Function call at start of line (standalone, not after a dot).",
+          "match": "^\\s*(?!fn\\b|function\\b|plex\\b|display\\b|fold\\b|new\\b|store\\b|if\\b|elif\\b|else\\b|for\\b|while\\b|return\\b|continue\\b|match\\b|break\\b)([a-zA-Z_][a-zA-Z0-9_-]*)\\b"
+        }
+      ]
+    },
+    "# region code block": {"-----------------------------------------------------": "code block"},
+    "code-block": {
+      "name": "meta.block.tempo",
+      "begin": "\\{",
+      "end": "\\}",
+      "beginCaptures": {
+        "0": { "name": "punctuation.brackets.curly.tempo" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.brackets.curly.tempo" }
+      },
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#keywords" },
+        { "include": "#fn-use" },
+        { "include": "#operators" },
+        { "include": "#strings" },
+        { "include": "#numbers" },
+        { "include": "#variables" },
+        { "include": "#punctuation" }
+      ]
+    },
+    "# region keywords, types, operators": {"■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■": "keywords, types, operators"},
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.tempo",
+          "match": "\\b(if|elif|else|for|while|return|continue|match|break)\\b"
+        },
+        {
+          "name": "keyword.declaration.tempo",
+          "match": "\\b(new|const|store)\\b"
+        }
+      ]
+    },
+
+    "types": {
+      "patterns": [
+        {
+          "name": "storage.type.primitive.tempo",
+          "prompt": "Find any of these items if it is the 1st token after a comma.",
+          "match": "(?<=,\\s*)(byte|int|uint|real|text|unorm|rgba|vector|page|dpage|qpage)\\b"
+        },
+        {
+           "name": "storage.type.complex.tempo",
+           "prompt": "Find any of these items if it is the 1st token after a comma.",
+           "match": "(?<=,\\s*)(list|file|path|buffer|rgba|reals)\\b"
+        }
+      ]
+    },
+
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.assignment.tempo",
+          "match": "(=|into)"
+        },
+        {
+          "name": "keyword.operator.arithmetic.tempo",
+          "match": "(\\+\\+|--|\\*\\*|//|%%|\\+|\\-(?!>)|\\*|\\/|\\%)"
+        },
+        {
+          "name": "keyword.operator.comparison.tempo",
+          "match": "(<|>|<=|>=|==|!=)"
+        },
+        {
+          "name": "keyword.operator.tempo",
+          "match": "[!?]"
+        }
+      ]
+    },
+
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.tempo",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tempo",
+              "match": "\\\\."
+            },
+            {
+              "name": "constant.other.placeholder.tempo",
+              "match": "\\{[^}]*\\}"
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.tempo",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tempo",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.raw.tempo",
+          "begin": "`",
+          "end": "`",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tempo",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.triple.tempo",
+          "begin": "'''",
+          "end": "'''",
+          "patterns": [
+            {
+              "name": "constant.character.escape.tempo",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.decimal.tempo",
+          "match": "\\b\\d+\\.\\d+\\b"
+        },
+        {
+          "name": "constant.numeric.integer.tempo",
+          "match": "\\b\\d+u?\\b"
+        },
+        {
+          "name": "constant.numeric.special.tempo",
+          "match": "\\b(infinity|real\\.infinity|real)\\b"
+        }
+      ]
+    },
+
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.terminator.tempo",
+          "match": "\\."
+        },
+        {
+          "name": "punctuation.separator.tempo",
+          "match": ","
+        },
+        {
+          "name": "punctuation.definition.brackets.tempo",
+          "match": "[\\[\\]{}()]"
+        }
+      ]
+    }
+  },
+  "scopeName": "source.tempo"
+}

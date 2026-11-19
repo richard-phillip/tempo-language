@@ -1,3 +1,4 @@
 *.vsix
 marketplace.md
 .gitignore
+.github/**

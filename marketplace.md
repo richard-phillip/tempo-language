@@ -7,9 +7,4 @@ Account: richard@eigenform.art
 
 Manage: https://marketplace.visualstudio.com/manage/publishers/RichardPhillip
 
-Trusted Publishing policy:
-
-- Repository owner: `richard-phillip`
-- Repository: `tempo-language`
-- Workflow: `publish.yaml`
-- Environment: leave empty
+Published by the existing Trusted Publishing policy on `richard-phillip/rust-python-functional-dark`, workflow `publish.yaml`, with the `extension` input set to `tempo`.
